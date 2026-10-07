@@ -13,7 +13,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_PATH = os.path.join(
     BASE_DIR,
-    "robotis_mujoco_menagerie",
     "robotis_tb3",
     "scene_turtlebot3_waffle_pi.xml"
 )
