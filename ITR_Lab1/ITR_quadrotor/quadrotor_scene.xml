@@ -1,0 +1,95 @@
+<!--
+  quadrotor_scene.xml  --  MJCF (MuJoCo XML) scene for the ITR Lab 1 quadrotor.
+
+  Contents:
+    * environment : sky-box, checkered floor, light, default camera angle
+    * quadrotor   : ONE rigid body ("base_link") with a FREE joint (6 DOF)
+                    built only from primitive geoms (no mesh files needed)
+
+  The pose of "base_link" is set directly from Python (quadrotor_sim.py),
+  so no actuators / thrust model are needed. Gravity is switched off and
+  the quadrotor never collides with anything (contype/conaffinity = 0).
+-->
+<mujoco model="quadrotor_scene">
+
+  <option timestep="0.002" gravity="0 0 0"/>
+
+  <!-- Where the free camera looks by default (Python can still override it). -->
+  <statistic center="0 0 0.6" extent="2.5"/>
+
+  <visual>
+    <global azimuth="0" elevation="-22"/>
+    <headlight ambient="0.45 0.45 0.45" diffuse="0.55 0.55 0.55" specular="0.1 0.1 0.1"/>
+    <quality shadowsize="4096"/>
+    <map znear="0.01"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.40 0.60 0.85" rgb2="0.05 0.05 0.12"
+             width="512" height="3072"/>
+    <texture type="2d" name="grid_tex" builtin="checker" mark="edge"
+             rgb1="0.22 0.28 0.34" rgb2="0.16 0.21 0.27" markrgb="0.75 0.75 0.75"
+             width="512" height="512"/>
+    <material name="floor_mat"  texture="grid_tex" texuniform="true" texrepeat="6 6" reflectance="0"/>
+
+    <material name="frame_mat"  rgba="0.12 0.12 0.14 1" specular="0.4" shininess="0.4"/>
+    <material name="arm_mat"    rgba="0.30 0.30 0.34 1" specular="0.3" shininess="0.3"/>
+    <material name="front_mat"  rgba="1.00 0.55 0.05 1"/>   <!-- orange : front (+X) side -->
+    <material name="rear_mat"   rgba="0.85 0.85 0.88 1"/>   <!-- white  : rear  (-X) side -->
+    <material name="rotor_front" rgba="1.00 0.55 0.05 0.35"/>
+    <material name="rotor_rear"  rgba="0.85 0.85 0.88 0.35"/>
+    <material name="motor_mat"  rgba="0.05 0.05 0.05 1"/>
+  </asset>
+
+  <default>
+    <!-- every quadrotor geom: visual only, no collisions -->
+    <geom contype="0" conaffinity="0"/>
+  </default>
+
+  <worldbody>
+
+    <!-- ===== Environment ===== -->
+    <light name="sun" pos="0 0 5" dir="0 0 -1" directional="true" diffuse="0.7 0.7 0.7" castshadow="true"/>
+    <geom name="floor" type="plane" size="4 4 0.05" material="floor_mat"/>
+
+    <!-- ===== Quadrotor =====
+         base_link origin  = centre of the quadrotor
+         +X (body)         = front (orange side)
+         +Z (body)         = up
+         The free joint gives 6 DOF: qpos = [x y z | qw qx qy qz]            -->
+    <body name="base_link" pos="0 0 0.5">
+      <freejoint name="root"/>
+
+      <!-- central plate + battery + front marker -->
+      <geom name="plate"   type="box" size="0.085 0.085 0.016" material="frame_mat"/>
+      <geom name="battery" type="box" pos="0 0 0.03" size="0.055 0.035 0.014" material="arm_mat"/>
+      <geom name="nose"    type="box" pos="0.095 0 0" size="0.018 0.04 0.012" material="front_mat"/>
+
+      <!-- four arms (diagonals, X-configuration) -->
+      <geom name="arm_fl" type="capsule" fromto="0 0 0   0.22  0.22 0" size="0.011" material="front_mat"/>
+      <geom name="arm_fr" type="capsule" fromto="0 0 0   0.22 -0.22 0" size="0.011" material="front_mat"/>
+      <geom name="arm_rl" type="capsule" fromto="0 0 0  -0.22  0.22 0" size="0.011" material="rear_mat"/>
+      <geom name="arm_rr" type="capsule" fromto="0 0 0  -0.22 -0.22 0" size="0.011" material="rear_mat"/>
+
+      <!-- motors -->
+      <geom name="motor_fl" type="cylinder" pos=" 0.22  0.22 0.015" size="0.022 0.018" material="motor_mat"/>
+      <geom name="motor_fr" type="cylinder" pos=" 0.22 -0.22 0.015" size="0.022 0.018" material="motor_mat"/>
+      <geom name="motor_rl" type="cylinder" pos="-0.22  0.22 0.015" size="0.022 0.018" material="motor_mat"/>
+      <geom name="motor_rr" type="cylinder" pos="-0.22 -0.22 0.015" size="0.022 0.018" material="motor_mat"/>
+
+      <!-- rotors (thin translucent discs) -->
+      <geom name="rotor_fl" type="cylinder" pos=" 0.22  0.22 0.036" size="0.10 0.003" material="rotor_front"/>
+      <geom name="rotor_fr" type="cylinder" pos=" 0.22 -0.22 0.036" size="0.10 0.003" material="rotor_front"/>
+      <geom name="rotor_rl" type="cylinder" pos="-0.22  0.22 0.036" size="0.10 0.003" material="rotor_rear"/>
+      <geom name="rotor_rr" type="cylinder" pos="-0.22 -0.22 0.036" size="0.10 0.003" material="rotor_rear"/>
+
+      <!-- sites = named reference points on the body (no mass, no collision) -->
+      <site name="center"   pos="0 0 0"          size="0.008" rgba="1 1 1 1"/>
+      <site name="site_fl"  pos=" 0.22  0.22 0.04" size="0.008" rgba="1 0.55 0.05 1"/>
+      <site name="site_fr"  pos=" 0.22 -0.22 0.04" size="0.008" rgba="1 0.55 0.05 1"/>
+      <site name="site_rl"  pos="-0.22  0.22 0.04" size="0.008" rgba="0.85 0.85 0.88 1"/>
+      <site name="site_rr"  pos="-0.22 -0.22 0.04" size="0.008" rgba="0.85 0.85 0.88 1"/>
+    </body>
+
+  </worldbody>
+</mujoco>
