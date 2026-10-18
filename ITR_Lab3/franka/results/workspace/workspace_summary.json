@@ -1,0 +1,31 @@
+{
+  "backend": "mujoco",
+  "task_workspace": {
+    "max_reach_r": 0.9206100751720886,
+    "z_min": 3.7603779479155903e-06,
+    "z_max": 1.250376104977847,
+    "samples": 28317
+  },
+  "dexterous": {
+    "lowest_tcp_z_fully_dexterous_over_band": 0.05,
+    "band_r": [
+      0.32,
+      0.68
+    ],
+    "dexterous_r_whole_approach_column": [
+      0.3,
+      0.75
+    ],
+    "yaws_tested": 12
+  },
+  "table_design": {
+    "H_recommended_min": 0.025,
+    "H_recommended_max": 0.415,
+    "H_chosen": 0.19999999999999998,
+    "L_x": 0.48,
+    "W_y": 1.1,
+    "grasp_tcp_z": 0.22499999999999998,
+    "transit_tcp_z": 0.335
+  },
+  "runtime_s": 38.71261787414551
+}

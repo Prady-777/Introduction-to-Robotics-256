@@ -1,0 +1,12 @@
+# Simulation + off-the-shelf IK
+mujoco>=3.2.0          # mj_geomDistance (clearance logging) needs >= 3.2
+mink>=0.0.5            # https://github.com/kevinzakka/mink
+qpsolvers[daqp]>=4.3   # QP backend for Mink and for our QP-IK
+# Analysis / plotting / video
+numpy
+scipy
+pandas
+matplotlib
+imageio
+imageio-ffmpeg
+pillow
